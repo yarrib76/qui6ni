@@ -70,6 +70,68 @@ Para detener:
 docker compose --env-file .env.docker down
 ```
 
+### Script de despliegue en servidor
+
+En el servidor, clonar el repo y crear `.env.docker`:
+
+En Windows/CMD, dentro de `C:\Proyectos\Quini6`:
+
+```bat
+copy .env.docker.example .env.docker
+notepad .env.docker
+scripts\deploy-docker.cmd
+```
+
+Si ya tenes MySQL en otro contenedor o instalado en el servidor, no levantes el MySQL de este compose. Configura `.env.docker` apuntando a esa base y usa:
+
+```bat
+scripts\deploy-docker-external-db.cmd
+```
+
+En ese caso, `.env.docker` debe tener por ejemplo:
+
+```env
+APP_PORT=3030
+PORT=3000
+DB_HOST=host.docker.internal
+DB_PORT=3306
+DB_NAME=quini6
+DB_USER=tu_usuario
+DB_PASSWORD=tu_password
+```
+
+Si tu MySQL esta en otro contenedor de Docker, `DB_HOST` debe ser el nombre del contenedor o servicio MySQL, y ambos contenedores deben compartir una red Docker.
+
+En Linux o Git Bash:
+
+```bash
+cd /c/Proyectos/Quini6
+cp .env.docker.example .env.docker
+chmod +x scripts/deploy-docker.sh
+./scripts/deploy-docker.sh
+```
+
+Editar `.env.docker` y cambiar passwords/puertos antes de levantar.
+
+Si el repo esta en otra carpeta, Windows/CMD:
+
+```bat
+set APP_DIR=C:\Otra\Ruta\Quini6
+scripts\deploy-docker.cmd
+```
+
+Si el repo esta en otra carpeta, Linux/Git Bash:
+
+```bash
+APP_DIR=/c/Proyectos/Quini6 ./scripts/deploy-docker.sh
+```
+
+Para forzar build sin cache:
+
+```bash
+NO_CACHE=1 ./scripts/deploy-docker.sh
+```
+
 Para migrar datos desde otro servidor MySQL:
 
 ```bash

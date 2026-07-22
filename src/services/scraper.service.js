@@ -6,7 +6,7 @@ import { parseDrawHtml } from '../scraper/parser.js';
 import { MODALIDADES } from '../scraper/normalizer.js';
 import { getModalidadesByCodigo } from '../repositories/modalidades.repository.js';
 import { insertJugada } from '../repositories/jugadas.repository.js';
-import { getExistingDrawNumbers, getLastDraw, upsertSorteo } from '../repositories/sorteos.repository.js';
+import { getExistingDrawNumbers, upsertSorteo } from '../repositories/sorteos.repository.js';
 import {
   addImportError,
   createImportacion,
@@ -129,7 +129,6 @@ async function runImport(importacionId, startedMs) {
     setState({ progress: { total: links.length } });
     await updateImportacion(importacionId, { sorteos_encontrados: links.length });
 
-    const parsedDraws = [];
     for (const link of links) {
       try {
         await sleep(env.scraper.requestDelayMs);
@@ -145,7 +144,34 @@ async function runImport(importacionId, startedMs) {
           setState({ progress: { skipped: state.progress.skipped + 1 } });
           continue;
         }
-        parsedDraws.push(draw);
+
+        try {
+          const result = await saveDraw(draw);
+          existingDrawNumbers.add(draw.numeroSorteo);
+          sorteoInicial =
+            sorteoInicial === null ? draw.numeroSorteo : Math.min(sorteoInicial, draw.numeroSorteo);
+          sorteoFinal =
+            sorteoFinal === null ? draw.numeroSorteo : Math.max(sorteoFinal, draw.numeroSorteo);
+          setState({
+            progress: {
+              inserted: state.progress.inserted + 1,
+              jugadasInserted: state.progress.jugadasInserted + result.jugadasInsertadas
+            }
+          });
+        } catch (error) {
+          finalStatus = 'ADVERTENCIA';
+          setState({
+            progress: {
+              errors: state.progress.errors + 1
+            }
+          });
+          await addImportError(importacionId, {
+            numeroSorteo: draw.numeroSorteo,
+            url: draw.urlOrigen,
+            tipoError: error.name || 'MYSQL_ERROR',
+            descripcion: error.message
+          });
+        }
       } catch (error) {
         finalStatus = 'ADVERTENCIA';
         setState({
@@ -157,35 +183,6 @@ async function runImport(importacionId, startedMs) {
         await addImportError(importacionId, {
           url: link.url,
           tipoError: error.name || 'SCRAPER_ERROR',
-          descripcion: error.message
-        });
-      }
-    }
-
-    parsedDraws.sort((a, b) => a.numeroSorteo - b.numeroSorteo);
-    sorteoInicial = parsedDraws[0]?.numeroSorteo || null;
-    sorteoFinal = parsedDraws[parsedDraws.length - 1]?.numeroSorteo || null;
-
-    for (const draw of parsedDraws) {
-      try {
-        const result = await saveDraw(draw);
-        setState({
-          progress: {
-            inserted: state.progress.inserted + 1,
-            jugadasInserted: state.progress.jugadasInserted + result.jugadasInsertadas
-          }
-        });
-      } catch (error) {
-        finalStatus = 'ADVERTENCIA';
-        setState({
-          progress: {
-            errors: state.progress.errors + 1
-          }
-        });
-        await addImportError(importacionId, {
-          numeroSorteo: draw.numeroSorteo,
-          url: draw.urlOrigen,
-          tipoError: error.name || 'MYSQL_ERROR',
           descripcion: error.message
         });
       }
