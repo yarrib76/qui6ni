@@ -1,0 +1,45 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quini6-app
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  db:
+    image: mysql:8.4
+    container_name: quini6-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-quini6_root_change_me}
+      MYSQL_DATABASE: ${DB_NAME:-quini6}
+      MYSQL_USER: ${DB_USER:-quini6_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-quini6_pass_change_me}
+      TZ: America/Argentina/Buenos_Aires
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - quini6_mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  quini6_mysql_data:

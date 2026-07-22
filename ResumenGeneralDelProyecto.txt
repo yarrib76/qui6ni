@@ -1,0 +1,509 @@
+# Resumen general del proyecto Quini 6 con Inteligencia Artificial
+
+El proyecto consiste en desarrollar una aplicación web que permita recopilar, analizar y evaluar los resultados históricos del Quini 6, con el objetivo final de generar combinaciones de números mediante distintos métodos estadísticos y modelos de Inteligencia Artificial.
+
+La aplicación será desarrollada en **Node.js**, utilizará **MySQL** como base de datos y contará con una interfaz web para administrar la información, visualizar resultados, generar combinaciones y comparar estrategias.
+
+## Objetivo principal
+
+El objetivo no es asegurar que se puedan predecir los números ganadores, ya que cada sorteo debería ser un evento aleatorio e independiente.
+
+La finalidad será construir un sistema que permita:
+
+* Analizar el histórico completo de sorteos.
+* Detectar frecuencias, distribuciones o posibles sesgos.
+* Generar combinaciones mediante diferentes estrategias.
+* Simular cómo habrían funcionado esas estrategias en sorteos anteriores.
+* Comparar los resultados de los modelos contra combinaciones elegidas al azar.
+* Realizar jugadas reales con combinaciones sugeridas por el sistema.
+* Registrar y evaluar automáticamente los resultados de esas jugadas reales.
+* Ajustar y calibrar los modelos a partir de sus resultados históricos y reales.
+* Determinar mediante evidencia si alguna estrategia obtiene mejores resultados que el azar.
+
+---
+
+# Etapa 1: Obtención del histórico
+
+La primera etapa estará dedicada exclusivamente a obtener y almacenar los resultados históricos del Quini 6.
+
+Inicialmente se descargarán las modalidades:
+
+* Primer Sorteo o Tradicional.
+* La Segunda del Quini.
+
+El sistema realizará scraping de una página de resultados y guardará en MySQL:
+
+* Número de sorteo.
+* Fecha.
+* Modalidad.
+* Los seis números sorteados.
+* URL de origen.
+* Fecha de descarga.
+
+La actualización será incremental. El sistema verificará cuál fue el último sorteo almacenado y descargará únicamente los sorteos nuevos, evitando duplicados.
+
+La aplicación tendrá una pantalla llamada **Histórico de jugadas**, desde donde se podrá:
+
+* Ejecutar la actualización del histórico.
+* Ver el último sorteo descargado.
+* Consultar el estado de cada importación.
+* Revisar errores.
+* Visualizar los resultados agrupados por año, mes, día y sorteo.
+* Filtrar y buscar información mediante una DataTable.
+
+---
+
+# Etapa 2: Análisis estadístico
+
+Una vez construido el histórico, se incorporará un módulo de estadísticas.
+
+Este módulo permitirá analizar:
+
+* Frecuencia de aparición de cada número.
+* Números más y menos frecuentes.
+* Frecuencia por períodos.
+* Cantidad de números pares e impares.
+* Distribución por decenas.
+* Suma total de cada combinación.
+* Cantidad de números consecutivos.
+* Números repetidos respecto del sorteo anterior.
+* Tiempo transcurrido desde la última aparición de cada número.
+* Frecuencia de pares, tríos y grupos de números.
+* Comparación entre Primer Sorteo y La Segunda.
+
+Los resultados se mostrarán mediante tablas, gráficos, indicadores y mapas de calor.
+
+---
+
+# Etapa 3: Generación de combinaciones
+
+La aplicación incorporará diferentes estrategias para generar jugadas.
+
+Entre ellas:
+
+* Selección totalmente aleatoria.
+* Números más frecuentes.
+* Números menos frecuentes.
+* Combinaciones equilibradas entre pares e impares.
+* Combinaciones por distribución de decenas.
+* Números con mayor tiempo sin aparecer.
+* Métodos ponderados por frecuencia.
+* Simulaciones Monte Carlo.
+* Algoritmos genéticos.
+* Combinaciones generadas mediante modelos de Machine Learning.
+
+Cada estrategia podrá generar una o varias combinaciones de seis números.
+
+Al generar una combinación, el sistema deberá permitir indicar si se utilizará solamente como:
+
+* Simulación.
+* Prueba histórica.
+* Jugada real.
+
+---
+
+# Etapa 4: Modelos de Inteligencia Artificial
+
+Posteriormente se entrenarán y evaluarán distintos modelos, por ejemplo:
+
+* Regresión logística adaptada a clasificación múltiple.
+* Random Forest.
+* XGBoost.
+* Redes neuronales.
+* Modelos de series temporales.
+* LSTM.
+* Transformers.
+* Ensembles que combinen varios modelos.
+
+Los modelos utilizarán el histórico para intentar asignar una probabilidad o puntuación a cada número.
+
+El sistema no presentará estas probabilidades como certezas, sino como resultados experimentales que deberán evaluarse contra el azar.
+
+---
+
+# Etapa 5: Backtesting y simulaciones
+
+El backtesting permitirá simular qué habría pasado si cada estrategia se hubiera utilizado en sorteos históricos.
+
+Por ejemplo:
+
+1. Entrenar un modelo con los sorteos anteriores a una determinada fecha.
+2. Generar combinaciones para el sorteo siguiente.
+3. Compararlas con el resultado real.
+4. Registrar cuántos números fueron acertados.
+5. Repetir el proceso a lo largo de cientos de sorteos.
+
+Se medirán resultados como:
+
+* Cantidad de jugadas con cero aciertos.
+* Jugadas con uno, dos, tres, cuatro, cinco o seis aciertos.
+* Promedio de aciertos.
+* Mejor resultado obtenido.
+* Rendimiento por estrategia.
+* Comparación contra jugadas aleatorias.
+* Consistencia de los resultados a través del tiempo.
+
+Es fundamental que los modelos se evalúen utilizando únicamente la información disponible antes de cada sorteo, para evitar que utilicen datos futuros durante el entrenamiento.
+
+Todas estas jugadas deberán quedar identificadas como:
+
+```text
+SIMULADA
+```
+
+Las simulaciones no deben mezclarse con las jugadas realizadas efectivamente.
+
+---
+
+# Etapa 6: Jugadas reales
+
+El proyecto incluirá una sección específica para realizar y registrar pruebas reales.
+
+El usuario podrá solicitar al sistema una combinación considerada por el modelo como una combinación probable o recomendada para el próximo sorteo.
+
+Luego podrá realizar físicamente la apuesta en una agencia oficial.
+
+La combinación generada deberá poder marcarse como:
+
+```text
+REAL
+```
+
+Una jugada real nunca deberá confundirse con una jugada simulada o generada únicamente para backtesting.
+
+## Menú independiente
+
+Las jugadas reales deberán estar disponibles desde una opción independiente del menú:
+
+**Jugadas reales**
+
+Esta sección estará separada de:
+
+* Jugadas simuladas.
+* Backtesting.
+* Pruebas históricas.
+* Combinaciones generadas que finalmente no fueron apostadas.
+
+Esto permitirá consultar exclusivamente el dinero y las combinaciones que realmente se jugaron.
+
+## Registro de una jugada real
+
+Cada jugada real deberá guardar, como mínimo:
+
+* Identificador interno.
+* Estado real o simulada.
+* Los seis números elegidos.
+* Fecha y hora en que fue generada.
+* Fecha en que se realizó la apuesta.
+* Número de sorteo.
+* Fecha del sorteo.
+* Estrategia utilizada.
+* Modelo utilizado.
+* Versión del modelo.
+* Parámetros o configuración utilizada.
+* Fecha del último histórico disponible al momento de generar la jugada.
+* Tipo de apuesta.
+* Número o referencia del comprobante, cuando esté disponible.
+* Importe apostado.
+* Observaciones.
+* Estado de evaluación.
+
+## Datos del comprobante
+
+Al registrar una jugada real se deberán guardar los datos que aparezcan en el comprobante de la apuesta, especialmente:
+
+* Número de sorteo.
+* Fecha del sorteo.
+* Fecha de realización de la apuesta.
+* Número o identificador del comprobante.
+* Combinación de seis números.
+* Modalidades en las que participa.
+
+Para la apuesta tradicional, una misma combinación participa en:
+
+* Tradicional – Primer Sorteo.
+* Tradicional – La Segunda.
+
+Por lo tanto, la jugada real deberá quedar relacionada con ambas modalidades.
+
+No se deben guardar dos combinaciones distintas cuando el comprobante contiene una única combinación que participa en ambas extracciones.
+
+La estructura deberá permitir registrar las modalidades de la jugada, por ejemplo:
+
+```text
+TRADICIONAL_PRIMERA
+TRADICIONAL_SEGUNDA
+```
+
+Una misma jugada real podrá tener asociadas ambas modalidades.
+
+En etapas futuras también se podrán incorporar:
+
+```text
+REVANCHA
+SIEMPRE_SALE
+```
+
+## Estados de una jugada real
+
+Una jugada real podrá tener los siguientes estados:
+
+```text
+PENDIENTE
+EVALUADA
+ANULADA
+```
+
+* `PENDIENTE`: todavía no se descargó el resultado del sorteo.
+* `EVALUADA`: el resultado ya fue descargado y comparado.
+* `ANULADA`: la jugada fue generada, pero finalmente no fue válida o fue anulada.
+
+También deberá diferenciarse si la combinación fue:
+
+```text
+GENERADA
+CONFIRMADA_COMO_REAL
+```
+
+Una combinación sugerida por el sistema no debe considerarse una jugada real hasta que el usuario confirme que efectivamente realizó la apuesta.
+
+---
+
+# Etapa 7: Evaluación automática de jugadas reales
+
+Cuando se ejecute una nueva actualización del histórico, el sistema deberá verificar si existen jugadas reales pendientes correspondientes a los sorteos descargados.
+
+El proceso será:
+
+1. Descargar los nuevos resultados.
+2. Guardar Tradicional – Primer Sorteo.
+3. Guardar Tradicional – La Segunda.
+4. Buscar jugadas reales pendientes de ese número de sorteo.
+5. Comparar cada combinación real contra el Primer Sorteo.
+6. Comparar la misma combinación contra La Segunda.
+7. Calcular la cantidad de aciertos en cada modalidad.
+8. Registrar los números acertados.
+9. Cambiar el estado de la jugada a evaluada.
+10. Mostrar el resultado en la sección Jugadas reales.
+
+## Resultado de la evaluación
+
+Por cada modalidad se deberá guardar:
+
+* Modalidad evaluada.
+* Números sorteados.
+* Cantidad de aciertos.
+* Números acertados.
+* Números no acertados.
+* Fecha y hora de evaluación.
+* Premio obtenido, cuando esta información esté disponible.
+* Importe del premio.
+* Observaciones.
+
+Ejemplo:
+
+```text
+Jugada real:
+05 - 12 - 18 - 27 - 34 - 42
+
+Primer Sorteo:
+05 - 10 - 18 - 25 - 34 - 45
+
+Aciertos: 3
+Números acertados: 05, 18, 34
+
+La Segunda:
+03 - 12 - 20 - 27 - 39 - 42
+
+Aciertos: 3
+Números acertados: 12, 27, 42
+```
+
+La evaluación debe realizarse de manera independiente para Primer Sorteo y La Segunda.
+
+---
+
+# Etapa 8: Verificación y calibración del sistema
+
+Las jugadas reales servirán para verificar cómo se comporta el sistema fuera de las simulaciones.
+
+El proceso de calibración deberá permitir analizar:
+
+* Qué modelo generó cada combinación.
+* Qué versión del modelo se utilizó.
+* Con qué cantidad de datos fue entrenado.
+* Qué parámetros tenía.
+* Cuántos aciertos obtuvo.
+* En qué modalidad obtuvo los aciertos.
+* Cómo se compara contra una combinación aleatoria.
+* Cómo se compara contra otras versiones del modelo.
+* Si el rendimiento mejora o empeora con el tiempo.
+
+El sistema deberá conservar la configuración exacta utilizada para generar cada jugada.
+
+Esto es importante porque el modelo podrá modificarse posteriormente, pero una jugada histórica debe seguir asociada a la versión original que la generó.
+
+## Proceso de calibración
+
+Una posible metodología será:
+
+1. Generar una combinación mediante el modelo activo.
+2. Guardar la combinación y los parámetros utilizados.
+3. Confirmar si fue efectivamente jugada.
+4. Esperar la publicación del sorteo.
+5. Descargar automáticamente los resultados.
+6. Evaluar los aciertos.
+7. Incorporar el resultado a las métricas del modelo.
+8. Comparar contra estrategias de control.
+9. Analizar si corresponde ajustar parámetros.
+10. Crear una nueva versión del modelo si se realizan cambios.
+
+Los resultados reales podrán utilizarse para analizar y recalibrar el sistema, pero no deberán interpretarse aisladamente.
+
+Una sola jugada con muchos o pocos aciertos no será suficiente para determinar que un modelo funciona o no funciona. La evaluación deberá realizarse sobre una cantidad significativa de sorteos.
+
+---
+
+# Etapa 9: Comparación entre resultados reales y simulados
+
+La aplicación permitirá comparar:
+
+* Rendimiento de jugadas reales.
+* Rendimiento de jugadas simuladas.
+* Rendimiento del modelo.
+* Rendimiento de combinaciones aleatorias.
+* Rendimiento de otras estrategias estadísticas.
+
+Las métricas deberán poder filtrarse por:
+
+* Período.
+* Modelo.
+* Versión.
+* Estrategia.
+* Modalidad.
+* Tipo de jugada.
+* Real o simulada.
+
+Esto permitirá responder preguntas como:
+
+* ¿Cuántos aciertos promedio tuvieron las jugadas reales?
+* ¿El modelo superó al azar?
+* ¿La versión actual funciona mejor que la anterior?
+* ¿Hubo más aciertos en Primer Sorteo o en La Segunda?
+* ¿Las pruebas reales coinciden con los resultados obtenidos en el backtesting?
+
+---
+
+# Etapa 10: Comparación económica
+
+En una etapa posterior se podrá incorporar el costo de las apuestas y los premios correspondientes.
+
+El sistema podrá calcular:
+
+* Cantidad de apuestas reales realizadas.
+* Costo total apostado.
+* Premios obtenidos.
+* Resultado neto.
+* Retorno sobre el dinero apostado.
+* Rendimiento por estrategia.
+* Rendimiento por modelo.
+* Rendimiento por versión.
+
+Las jugadas reales y las simuladas deberán mantenerse separadas también en los cálculos económicos.
+
+Una simulación podrá mostrar una rentabilidad teórica, mientras que una jugada real mostrará el resultado económico efectivamente obtenido.
+
+---
+
+# Etapa 11: Automatización
+
+Finalmente, el sistema podrá automatizar tareas como:
+
+* Descargar los resultados después de cada sorteo.
+* Actualizar estadísticas.
+* Evaluar jugadas reales pendientes.
+* Evaluar jugadas simuladas.
+* Reentrenar modelos cuando haya nuevos datos.
+* Generar combinaciones para el próximo sorteo.
+* Registrar el rendimiento de cada estrategia.
+* Informar cuando una jugada real haya sido evaluada.
+
+---
+
+# Interfaz general
+
+La aplicación contará con una barra superior y un menú lateral.
+
+Las opciones futuras del menú podrían ser:
+
+* Histórico de jugadas.
+* Importaciones.
+* Estadísticas.
+* Frecuencia de números.
+* Generador de combinaciones.
+* Modelos de IA.
+* Backtesting.
+* Jugadas simuladas.
+* Jugadas reales.
+* Comparación de estrategias.
+* Resultados económicos.
+* Configuración.
+
+## Menú “Jugadas reales”
+
+La pantalla de Jugadas reales deberá permitir:
+
+* Registrar una jugada realizada.
+* Confirmar como real una combinación generada previamente.
+* Cargar datos del comprobante.
+* Ver jugadas pendientes de evaluación.
+* Ver jugadas evaluadas.
+* Consultar aciertos por modalidad.
+* Ver los números acertados.
+* Filtrar por fecha y sorteo.
+* Filtrar por modelo.
+* Filtrar por estrategia.
+* Consultar costo y premio.
+* Acceder al detalle completo de cada jugada.
+
+---
+
+# Alcance y criterio científico
+
+El proyecto debe desarrollarse como un laboratorio de análisis estadístico y Machine Learning.
+
+No debe afirmar que puede predecir con certeza los números ganadores.
+
+La pregunta central que buscará responder será:
+
+**¿Algún método estadístico o modelo de Inteligencia Artificial puede obtener resultados consistentemente mejores que una selección completamente aleatoria?**
+
+Todas las estrategias deberán compararse bajo las mismas condiciones y utilizando métricas objetivas.
+
+Las pruebas reales permitirán verificar que el rendimiento observado en simulaciones y backtesting también se sostenga utilizando apuestas efectivamente realizadas.
+
+Incluso si ningún modelo logra superar al azar, el proyecto seguirá siendo válido, ya que habrá demostrado esa conclusión mediante datos, simulaciones, jugadas reales y experimentos reproducibles.
+
+---
+
+# Resultado final esperado
+
+Al finalizar el proyecto, la aplicación permitirá:
+
+1. Mantener actualizado el histórico del Quini 6.
+2. Consultar y verificar todos los sorteos almacenados.
+3. Analizar estadísticamente los resultados.
+4. Generar combinaciones mediante múltiples estrategias.
+5. Entrenar modelos de Inteligencia Artificial.
+6. Simular el rendimiento histórico de cada modelo.
+7. Solicitar una combinación recomendada para un sorteo futuro.
+8. Confirmar que esa combinación fue efectivamente apostada.
+9. Registrar los datos del comprobante.
+10. Diferenciar claramente las jugadas reales de las simuladas.
+11. Evaluar automáticamente las jugadas reales cuando se descarguen los resultados.
+12. Calcular los aciertos obtenidos en Primer Sorteo y La Segunda.
+13. Conservar el historial de resultados por modelo y versión.
+14. Comparar pruebas reales, simulaciones y selecciones aleatorias.
+15. Calibrar y versionar los modelos.
+16. Medir costos, premios y rentabilidad.
+17. Determinar si existe alguna ventaja estadísticamente significativa.

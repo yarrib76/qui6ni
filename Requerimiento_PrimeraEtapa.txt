@@ -1,0 +1,846 @@
+# Proyecto Quini 6 – Etapa 1
+
+## Obtención y visualización del histórico
+
+## 1. Objetivo
+
+Desarrollar la primera etapa de una aplicación web que permita obtener, almacenar y consultar el histórico de resultados del Quini 6 para las modalidades:
+
+* Tradicional / Primer Sorteo
+* La Segunda del Quini
+
+En esta etapa no se realizarán predicciones, estadísticas avanzadas ni entrenamiento de modelos de Machine Learning.
+
+El alcance se limita a:
+
+1. Obtener los resultados históricos mediante scraping.
+2. Guardar los resultados en una base de datos MySQL.
+3. Actualizar únicamente los sorteos que todavía no estén guardados.
+4. Visualizar y verificar la información descargada desde una interfaz web.
+
+---
+
+# 2. Tecnologías
+
+## Backend
+
+* Node.js
+* Express.js
+* MySQL
+* mysql2 con soporte para Promises
+* Axios o Fetch para descargar páginas
+* Cheerio para procesar el HTML
+* Variables de entorno mediante dotenv
+
+## Frontend
+
+Puede utilizarse:
+
+* HTML
+* CSS
+* JavaScript
+* Bootstrap
+* DataTables
+
+No utilizar frameworks frontend complejos en esta primera etapa, salvo que exista una razón técnica justificada.
+
+---
+
+# 3. Estructura general de la aplicación
+
+La aplicación debe tener una interfaz administrativa con:
+
+* Barra de navegación superior horizontal.
+* Menú lateral izquierdo.
+* Área principal de contenido.
+* Diseño adaptable a escritorio.
+* Menú lateral que pueda contraerse y expandirse.
+
+La primera opción del menú será:
+
+**Histórico de jugadas**
+
+En esta primera etapa será la única opción funcional.
+
+---
+
+# 4. Pantalla “Histórico de jugadas”
+
+La pantalla debe incluir:
+
+## Encabezado
+
+Título:
+
+**Histórico de jugadas del Quini 6**
+
+Descripción breve:
+
+“Consulta y actualización de los resultados históricos del Primer Sorteo y La Segunda.”
+
+## Información de actualización
+
+Mostrar:
+
+* Fecha y hora de la última ejecución del scraper.
+* Último número de sorteo guardado.
+* Fecha del último sorteo guardado.
+* Cantidad total de sorteos almacenados.
+* Cantidad total de jugadas almacenadas.
+* Estado de la última actualización:
+
+  * Exitosa
+  * Exitosa con advertencias
+  * Fallida
+  * En proceso
+
+## Botón de actualización
+
+Agregar un botón:
+
+**Bajar históricos**
+
+Al presionarlo, el sistema debe:
+
+1. Consultar en MySQL cuál es el último sorteo almacenado.
+2. Determinar qué sorteos faltan descargar.
+3. Descargar únicamente los sorteos faltantes.
+4. Extraer los resultados de:
+
+   * Primer Sorteo
+   * La Segunda
+5. Validar los datos.
+6. Guardarlos en la base de datos.
+7. Mostrar un resumen de la operación.
+
+El resumen debe indicar:
+
+* Sorteos encontrados.
+* Sorteos nuevos descargados.
+* Jugadas insertadas.
+* Sorteos ya existentes omitidos.
+* Errores encontrados.
+* Tiempo total del proceso.
+
+Mientras se ejecuta el proceso:
+
+* Deshabilitar el botón.
+* Mostrar un indicador de carga.
+* Mostrar el texto “Actualizando históricos...”.
+* Evitar que el usuario pueda iniciar dos actualizaciones simultáneas.
+
+---
+
+# 5. Comportamiento incremental
+
+El scraper no debe volver a descargar todo el histórico cada vez que se ejecuta.
+
+Debe consultar:
+
+* Último número de sorteo almacenado.
+* Fecha del último sorteo almacenado.
+
+A partir de esa información debe intentar obtener solamente los sorteos posteriores.
+
+La prevención de duplicados no debe depender únicamente de la lógica del código. También debe existir una restricción única en MySQL.
+
+La combinación que identifica una jugada será:
+
+* Número de sorteo.
+* Modalidad.
+
+Por ejemplo:
+
+* Sorteo 3392 + Tradicional
+* Sorteo 3392 + Segunda
+
+No puede existir más de un registro para la misma combinación de sorteo y modalidad.
+
+---
+
+# 6. Primera carga
+
+Cuando la base de datos no tenga resultados, el sistema debe realizar una carga inicial completa.
+
+La aplicación debe permitir configurar desde qué año o desde qué sorteo comenzar la importación.
+
+Variables sugeridas:
+
+```env
+SCRAPER_START_YEAR=1988
+SCRAPER_START_DRAW=
+SCRAPER_BASE_URL=
+```
+
+Si `SCRAPER_START_DRAW` tiene un valor, debe tener prioridad sobre el año inicial.
+
+La URL del sitio utilizado para el scraping debe estar configurada en variables de entorno y no escrita directamente en distintos archivos del código.
+
+---
+
+# 7. Modalidades
+
+En esta etapa se almacenarán únicamente:
+
+```text
+TRADICIONAL
+SEGUNDA
+```
+
+En la interfaz deberán mostrarse como:
+
+* Primer Sorteo
+* La Segunda
+
+No importar todavía:
+
+* Revancha
+* Siempre Sale
+* Pozo extra
+* Premios
+* Cantidad de ganadores
+
+La estructura debe quedar preparada para incorporar otras modalidades en etapas futuras.
+
+---
+
+# 8. Datos que deben guardarse
+
+Por cada modalidad se deben guardar:
+
+* Número de sorteo.
+* Fecha del sorteo.
+* Modalidad.
+* Número 1.
+* Número 2.
+* Número 3.
+* Número 4.
+* Número 5.
+* Número 6.
+* URL de origen.
+* Fecha y hora de descarga.
+* Fecha y hora de creación del registro.
+* Fecha y hora de última modificación.
+
+Los seis números deben guardarse ordenados de menor a mayor.
+
+Los valores válidos son números enteros entre:
+
+```text
+0 y 45
+```
+
+No deben existir números repetidos dentro de la misma jugada.
+
+---
+
+# 9. Modelo de base de datos
+
+## Tabla: `quini_sorteos`
+
+Representa la información general de cada sorteo.
+
+Campos sugeridos:
+
+```sql
+CREATE TABLE quini_sorteos (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    numero_sorteo INT UNSIGNED NOT NULL,
+    fecha_sorteo DATE NOT NULL,
+    url_origen VARCHAR(500) NULL,
+    fecha_descarga DATETIME NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_quini_sorteo_numero (numero_sorteo),
+    INDEX idx_quini_sorteo_fecha (fecha_sorteo)
+);
+```
+
+## Tabla: `quini_jugadas`
+
+Representa cada modalidad dentro de un sorteo.
+
+```sql
+CREATE TABLE quini_jugadas (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    sorteo_id BIGINT UNSIGNED NOT NULL,
+    modalidad ENUM('TRADICIONAL', 'SEGUNDA') NOT NULL,
+    numero_1 TINYINT UNSIGNED NOT NULL,
+    numero_2 TINYINT UNSIGNED NOT NULL,
+    numero_3 TINYINT UNSIGNED NOT NULL,
+    numero_4 TINYINT UNSIGNED NOT NULL,
+    numero_5 TINYINT UNSIGNED NOT NULL,
+    numero_6 TINYINT UNSIGNED NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_quini_jugada_sorteo_modalidad (
+        sorteo_id,
+        modalidad
+    ),
+    CONSTRAINT fk_quini_jugada_sorteo
+        FOREIGN KEY (sorteo_id)
+        REFERENCES quini_sorteos(id)
+        ON DELETE CASCADE
+);
+```
+
+## Tabla: `quini_importaciones`
+
+Debe registrarse cada ejecución del scraper.
+
+```sql
+CREATE TABLE quini_importaciones (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    fecha_inicio DATETIME NOT NULL,
+    fecha_fin DATETIME NULL,
+    estado ENUM(
+        'EN_PROCESO',
+        'EXITOSA',
+        'ADVERTENCIA',
+        'FALLIDA'
+    ) NOT NULL,
+    sorteo_inicial INT UNSIGNED NULL,
+    sorteo_final INT UNSIGNED NULL,
+    sorteos_procesados INT UNSIGNED NOT NULL DEFAULT 0,
+    sorteos_insertados INT UNSIGNED NOT NULL DEFAULT 0,
+    jugadas_insertadas INT UNSIGNED NOT NULL DEFAULT 0,
+    registros_omitidos INT UNSIGNED NOT NULL DEFAULT 0,
+    cantidad_errores INT UNSIGNED NOT NULL DEFAULT 0,
+    detalle TEXT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## Tabla opcional: `quini_importacion_errores`
+
+Para registrar errores individuales sin detener toda la importación.
+
+Campos sugeridos:
+
+* ID.
+* ID de importación.
+* Número de sorteo.
+* URL.
+* Tipo de error.
+* Descripción.
+* HTML o fragmento recibido, limitado a un tamaño razonable.
+* Fecha y hora.
+
+---
+
+# 10. Transacciones
+
+Cada sorteo debe guardarse utilizando una transacción MySQL.
+
+Proceso:
+
+1. Insertar o actualizar `quini_sorteos`.
+2. Insertar la jugada Tradicional.
+3. Insertar la jugada Segunda.
+4. Confirmar la transacción.
+
+Si una de las dos jugadas es inválida o falta, no guardar el sorteo como completo.
+
+En ese caso:
+
+* Hacer rollback.
+* Registrar el error.
+* Continuar con el siguiente sorteo.
+
+---
+
+# 11. Validaciones del scraper
+
+Antes de guardar un sorteo se debe validar:
+
+* Número de sorteo válido.
+* Fecha válida.
+* Existencia de Tradicional.
+* Existencia de La Segunda.
+* Exactamente seis números por modalidad.
+* Números enteros.
+* Números entre 0 y 45.
+* Sin números repetidos.
+* Números ordenados de menor a mayor.
+* Tradicional y Segunda identificadas correctamente.
+* Sorteo no duplicado.
+
+Si el HTML cambió y no se puede identificar la información, no guardar datos parciales como si fueran correctos.
+
+---
+
+# 12. Manejo de errores
+
+El scraper debe ser tolerante a fallos.
+
+Un error en un sorteo no debe cancelar necesariamente toda la importación.
+
+Debe contemplar:
+
+* Página no encontrada.
+* Timeout.
+* Error de conexión.
+* HTML inesperado.
+* Resultado incompleto.
+* Números inválidos.
+* Fecha inválida.
+* Sorteo ya existente.
+* Error de MySQL.
+* Bloqueo temporal del sitio.
+* Respuesta HTTP 403, 429 o 500.
+
+Agregar:
+
+* Reintentos automáticos configurables.
+* Pausa entre solicitudes.
+* Timeout configurable.
+* User-Agent identificable.
+* Límite máximo de reintentos.
+
+Variables sugeridas:
+
+```env
+SCRAPER_REQUEST_DELAY_MS=1000
+SCRAPER_TIMEOUT_MS=15000
+SCRAPER_MAX_RETRIES=3
+```
+
+No realizar solicitudes masivas sin pausa.
+
+---
+
+# 13. DataTable del histórico
+
+La pantalla debe contener una tabla para visualizar los resultados almacenados.
+
+Debe implementarse con DataTables y carga de datos desde el backend.
+
+Columnas mínimas:
+
+* Año.
+* Mes.
+* Fecha.
+* Número de sorteo.
+* Modalidad.
+* Número 1.
+* Número 2.
+* Número 3.
+* Número 4.
+* Número 5.
+* Número 6.
+* Fecha de descarga.
+
+Debe permitir:
+
+* Buscar.
+* Ordenar.
+* Paginar.
+* Filtrar por año.
+* Filtrar por mes.
+* Filtrar por modalidad.
+* Filtrar por número de sorteo.
+* Filtrar por rango de fechas.
+* Elegir cantidad de registros por página.
+
+La carga debe realizarse del lado del servidor para evitar cargar todo el histórico en el navegador.
+
+---
+
+# 14. Agrupación visual
+
+Los registros deben poder visualizarse agrupados jerárquicamente por:
+
+```text
+Año
+  └── Mes
+       └── Día / Sorteo
+            ├── Primer Sorteo
+            └── La Segunda
+```
+
+Ejemplo:
+
+```text
+2026
+ └── Julio
+      └── 19/07/2026 – Sorteo 3392
+           ├── Primer Sorteo: 05 17 27 28 31 45
+           └── La Segunda:   08 21 23 33 36 41
+```
+
+La jerarquía debe poder expandirse y contraerse.
+
+Además de esta vista agrupada, puede existir una vista tabular plana.
+
+Agregar un selector:
+
+* Vista agrupada.
+* Vista tabla.
+
+---
+
+# 15. Visualización de números
+
+Los números deben mostrarse visualmente como bolillas o etiquetas.
+
+Ejemplo:
+
+```text
+05  17  27  28  31  45
+```
+
+Los números menores a 10 deben visualizarse con cero inicial:
+
+```text
+00, 01, 02, 03...
+```
+
+En la base de datos deben guardarse como números enteros, no como texto.
+
+---
+
+# 16. API del backend
+
+## Consultar histórico
+
+```http
+GET /api/historico
+```
+
+Parámetros posibles:
+
+```text
+page
+pageSize
+year
+month
+modalidad
+numeroSorteo
+fechaDesde
+fechaHasta
+search
+orderBy
+orderDirection
+```
+
+Respuesta sugerida:
+
+```json
+{
+  "success": true,
+  "data": [],
+  "pagination": {
+    "page": 1,
+    "pageSize": 25,
+    "totalRecords": 0,
+    "totalPages": 0
+  }
+}
+```
+
+## Consultar resumen
+
+```http
+GET /api/historico/resumen
+```
+
+Debe devolver:
+
+* Último sorteo guardado.
+* Fecha del último sorteo.
+* Total de sorteos.
+* Total de jugadas.
+* Última importación.
+* Estado de la última importación.
+
+## Ejecutar actualización
+
+```http
+POST /api/historico/actualizar
+```
+
+Debe iniciar el proceso de scraping incremental.
+
+No debe aceptar dos ejecuciones simultáneas.
+
+## Consultar estado de actualización
+
+```http
+GET /api/historico/actualizacion/estado
+```
+
+Debe permitir que el frontend consulte el avance.
+
+Respuesta sugerida:
+
+```json
+{
+  "success": true,
+  "status": "EN_PROCESO",
+  "progress": {
+    "processed": 25,
+    "total": 100,
+    "inserted": 24,
+    "errors": 1
+  }
+}
+```
+
+## Consultar importaciones
+
+```http
+GET /api/importaciones
+```
+
+Debe mostrar el historial de ejecuciones del scraper.
+
+## Consultar errores de una importación
+
+```http
+GET /api/importaciones/:id/errores
+```
+
+---
+
+# 17. Control de ejecución simultánea
+
+Debe existir una protección para impedir que se ejecuten dos importaciones al mismo tiempo.
+
+Puede implementarse mediante:
+
+* Estado `EN_PROCESO` en la tabla de importaciones.
+* Lock en MySQL.
+* Lock interno en el proceso Node.js.
+
+La solución debe seguir funcionando correctamente aunque el usuario presione varias veces el botón.
+
+Al iniciar la aplicación, si existe una importación marcada como `EN_PROCESO` desde hace demasiado tiempo, debe considerarse interrumpida y registrarse como fallida o pendiente de revisión.
+
+---
+
+# 18. Registro y auditoría
+
+Registrar en logs:
+
+* Inicio de importación.
+* URL procesada.
+* Sorteo procesado.
+* Datos extraídos.
+* Datos omitidos.
+* Errores.
+* Finalización.
+* Duración.
+
+No guardar contraseñas ni datos sensibles en los logs.
+
+Separar:
+
+* Logs generales.
+* Logs del scraper.
+* Logs de errores.
+
+---
+
+# 19. Organización del código
+
+Estructura sugerida:
+
+```text
+quini6-app/
+├── src/
+│   ├── app.js
+│   ├── server.js
+│   ├── config/
+│   │   ├── database.js
+│   │   └── env.js
+│   ├── routes/
+│   │   ├── historico.routes.js
+│   │   └── importaciones.routes.js
+│   ├── controllers/
+│   │   ├── historico.controller.js
+│   │   └── importaciones.controller.js
+│   ├── services/
+│   │   ├── historico.service.js
+│   │   └── scraper.service.js
+│   ├── scraper/
+│   │   ├── discover.js
+│   │   ├── downloader.js
+│   │   ├── parser.js
+│   │   ├── validator.js
+│   │   └── normalizer.js
+│   ├── repositories/
+│   │   ├── sorteos.repository.js
+│   │   ├── jugadas.repository.js
+│   │   └── importaciones.repository.js
+│   ├── middleware/
+│   │   ├── errorHandler.js
+│   │   └── asyncHandler.js
+│   └── utils/
+│       ├── logger.js
+│       └── dates.js
+├── public/
+│   ├── css/
+│   ├── js/
+│   └── pages/
+├── database/
+│   ├── schema.sql
+│   └── migrations/
+├── logs/
+├── tests/
+├── .env.example
+├── package.json
+└── README.md
+```
+
+El código del scraper debe estar separado del acceso a la base de datos y de la interfaz web.
+
+---
+
+# 20. Configuración
+
+Crear un archivo `.env.example`:
+
+```env
+NODE_ENV=development
+PORT=3000
+
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=quini6
+DB_USER=
+DB_PASSWORD=
+
+SCRAPER_BASE_URL=
+SCRAPER_START_YEAR=1988
+SCRAPER_START_DRAW=
+SCRAPER_REQUEST_DELAY_MS=1000
+SCRAPER_TIMEOUT_MS=15000
+SCRAPER_MAX_RETRIES=3
+```
+
+No subir el archivo `.env` real al repositorio.
+
+---
+
+# 21. Seguridad básica
+
+Aunque sea una aplicación interna, implementar:
+
+* Validación de parámetros.
+* Consultas parametrizadas.
+* Protección contra SQL Injection.
+* Manejo centralizado de errores.
+* Límites razonables de paginación.
+* Sanitización de filtros.
+* No mostrar trazas internas al usuario.
+* No aceptar URLs arbitrarias desde el frontend para hacer scraping.
+
+---
+
+# 22. Pruebas
+
+Crear pruebas unitarias para:
+
+* Parser del HTML.
+* Normalización de números.
+* Validación de jugadas.
+* Detección de números repetidos.
+* Validación de rango 0–45.
+* Detección de Tradicional y Segunda.
+* Prevención de duplicados.
+
+Guardar ejemplos reales de HTML como fixtures para probar el parser sin consultar constantemente el sitio.
+
+Ejemplo:
+
+```text
+tests/
+└── fixtures/
+    ├── sorteo-valido.html
+    ├── sorteo-incompleto.html
+    └── estructura-desconocida.html
+```
+
+---
+
+# 23. Criterios de aceptación
+
+La etapa se considera terminada cuando:
+
+1. La aplicación inicia correctamente con Node.js.
+2. La conexión con MySQL funciona.
+3. Las tablas se crean mediante scripts o migraciones.
+4. La interfaz contiene barra superior y menú lateral.
+5. Existe la opción “Histórico de jugadas”.
+6. El botón “Bajar históricos” ejecuta la importación.
+7. La primera ejecución descarga el histórico configurado.
+8. Las siguientes ejecuciones descargan únicamente sorteos faltantes.
+9. No se generan registros duplicados.
+10. Cada sorteo contiene Tradicional y Segunda.
+11. Los números son validados antes de guardarse.
+12. Los datos pueden visualizarse en una DataTable.
+13. Se puede filtrar por año, mes, modalidad y sorteo.
+14. Se puede navegar por la estructura Año → Mes → Día → Jugadas.
+15. Se muestra la fecha de la última actualización.
+16. Se muestra el estado y resultado de la importación.
+17. Los errores quedan registrados.
+18. El scraper puede recuperarse de errores aislados.
+19. Existen pruebas unitarias básicas.
+20. El README explica instalación, configuración y ejecución.
+
+---
+
+# 24. Fuera de alcance de esta etapa
+
+No desarrollar todavía:
+
+* Predicción de números.
+* Machine Learning.
+* Redes neuronales.
+* Estadísticas de números calientes o fríos.
+* Simulaciones Monte Carlo.
+* Rentabilidad de jugadas.
+* Registro de apuestas reales.
+* Premios obtenidos.
+* Usuarios y autenticación.
+* Aplicación móvil.
+* Revancha.
+* Siempre Sale.
+
+---
+
+# 25. Consideraciones para futuras etapas
+
+Aunque no se desarrollen ahora, la estructura debe permitir incorporar posteriormente:
+
+* Nuevas modalidades.
+* Estadísticas.
+* Frecuencias.
+* Comparación de estrategias.
+* Predicciones.
+* Entrenamiento de modelos.
+* Backtesting.
+* Registro de jugadas sugeridas.
+* Comparación contra resultados reales.
+* Cálculo de aciertos y premios.
+
+Por esta razón, la modalidad no debe estar escrita de manera rígida en todo el sistema. Debe centralizarse en constantes o catálogos.
+
+---
+
+# 26. Resultado esperado
+
+Al finalizar esta etapa, el usuario debe poder:
+
+1. Ingresar a la aplicación.
+2. Abrir “Histórico de jugadas”.
+3. Ver hasta qué sorteo se encuentra actualizada la base.
+4. Presionar “Bajar históricos”.
+5. Descargar solamente los sorteos faltantes.
+6. Ver el resultado de la actualización.
+7. Consultar los sorteos almacenados.
+8. Expandir Año → Mes → Día.
+9. Visualizar los resultados de Primer Sorteo y La Segunda.
+10. Verificar manualmente que los datos sean correctos.

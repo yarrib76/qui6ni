@@ -1,0 +1,205 @@
+:root {
+  --topbar: #263238;
+  --sidebar: #f4f6f8;
+  --line: #d8dee4;
+  --ink: #1f2933;
+  --muted: #65737e;
+  --accent: #0f766e;
+  --accent-dark: #115e59;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: #ffffff;
+  font-size: 14px;
+}
+
+.topbar {
+  background: var(--topbar);
+  min-height: 56px;
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: calc(100vh - 56px);
+}
+
+.sidebar {
+  border-right: 1px solid var(--line);
+  background: var(--sidebar);
+  padding: 16px 12px;
+  transition: width 0.15s ease;
+}
+
+.sidebar.collapsed {
+  width: 64px;
+  overflow: hidden;
+}
+
+.sidebar .nav-link {
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.sidebar .nav-link.active {
+  background: #e4eceb;
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+
+.content {
+  min-width: 0;
+  padding: 24px;
+}
+
+.page-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.page-heading h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.page-heading p {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(130px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.metric {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  min-height: 78px;
+}
+
+.metric span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.metric strong {
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.status-panel,
+.filters,
+.grouped-view {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.status-details {
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+.view-tabs {
+  margin: 14px 0;
+}
+
+.ball {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #f2c94c;
+  border: 1px solid #d7a900;
+  color: #1f2933;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.balls {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.group-node {
+  border-top: 1px solid var(--line);
+  padding: 10px 0;
+}
+
+.group-node:first-child {
+  border-top: 0;
+}
+
+.group-node summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.draw-row {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0 8px 20px;
+}
+
+@media (max-width: 1100px) {
+  .summary-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .page-heading {
+    flex-direction: column;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .content {
+    padding: 16px;
+  }
+}

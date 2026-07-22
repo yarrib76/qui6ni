@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log*
+.env
+.env.*
+!.env.example
+!.env.docker.example
+.git
+.agents
+.codex
+logs
+coverage
+README.md
+tests
+Requerimiento_PrimeraEtapa.txt
+ResumenGeneralDelProyecto.txt
