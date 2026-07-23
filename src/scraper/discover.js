@@ -2,7 +2,7 @@ import { env } from '../config/env.js';
 import { downloadHtml } from './downloader.js';
 import { discoverResultLinks, discoverYearArchiveLinks } from './parser.js';
 
-export async function discoverHistoricalLinks() {
+export async function discoverHistoricalLinks(startYear = env.scraper.startYear) {
   const archiveUrl = new URL(env.scraper.archivePath, env.scraper.baseUrl).toString();
   const [homeHtml, archiveHtml] = await Promise.all([
     downloadHtml(env.scraper.baseUrl),
@@ -10,14 +10,14 @@ export async function discoverHistoricalLinks() {
   ]);
 
   const links = [
-    ...discoverResultLinks(homeHtml, env.scraper.baseUrl, env.scraper.startYear),
-    ...discoverResultLinks(archiveHtml, env.scraper.baseUrl, env.scraper.startYear)
+    ...discoverResultLinks(homeHtml, env.scraper.baseUrl, startYear),
+    ...discoverResultLinks(archiveHtml, env.scraper.baseUrl, startYear)
   ];
 
   const archiveLinks = new Map();
   for (const archiveLink of [
-    ...discoverYearArchiveLinks(homeHtml, env.scraper.baseUrl, env.scraper.startYear),
-    ...discoverYearArchiveLinks(archiveHtml, env.scraper.baseUrl, env.scraper.startYear)
+    ...discoverYearArchiveLinks(homeHtml, env.scraper.baseUrl, startYear),
+    ...discoverYearArchiveLinks(archiveHtml, env.scraper.baseUrl, startYear)
   ]) {
     archiveLinks.set(archiveLink.url, archiveLink);
   }
@@ -25,7 +25,7 @@ export async function discoverHistoricalLinks() {
   const yearPages = await Promise.all(
     Array.from(archiveLinks.values()).map(async (archiveLink) => {
       const html = await downloadHtml(archiveLink.url);
-      return discoverResultLinks(html, archiveLink.url, env.scraper.startYear);
+      return discoverResultLinks(html, archiveLink.url, startYear);
     })
   );
 

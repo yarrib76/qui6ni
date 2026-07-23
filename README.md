@@ -154,5 +154,169 @@ Incluye:
 - Registro de importaciones y errores.
 - API para historico, resumen, actualizacion e importaciones.
 - Interfaz administrativa con DataTables y vista agrupada.
+- Analisis estadistico por modalidad y periodo.
+- Frecuencia observada vs esperada por numero, diferencia porcentual y z-score.
+- Distribuciones de pares/impares, decenas, suma total, consecutivos y repetidos.
+- Pares y trios frecuentes.
+- Calidad del historico por anio.
+- Guardado opcional de snapshots de analisis para etapas futuras.
+- Generador de combinaciones con estrategias estadisticas iniciales.
+- Backtesting de estrategias usando solo sorteos anteriores al sorteo evaluado.
+- Comparacion y ranking de estrategias bajo los mismos parametros.
+- Gestion de jugadas candidatas generadas antes de confirmarlas como reales.
 
 No incluye predicciones, estadisticas avanzadas, IA, jugadas reales, premios, autenticacion ni Docker.
+
+## Etapa 2 - Analisis estadistico
+
+Antes de usar el guardado de analisis, ejecutar:
+
+```bash
+mysql -u TU_USUARIO -p quini6 < database/schema_etapa2.sql
+```
+
+La pantalla `Analisis estadistico` permite analizar:
+
+- Todo el historico.
+- Ultimo anio.
+- Ultimos N anios.
+- Ultimos N sorteos.
+- Rango de fechas.
+- Rango de sorteos.
+
+Los analisis pueden ejecutarse solo para consulta o guardarse como snapshot en:
+
+- `quini_analisis`
+- `quini_analisis_numeros`
+- `quini_analisis_distribuciones`
+- `quini_analisis_combinaciones`
+- `quini_analisis_calidad`
+
+## Etapa 3 - Generador de combinaciones
+
+Antes de usar el guardado de combinaciones, ejecutar:
+
+```bash
+mysql -u TU_USUARIO -p quini6 < database/schema_etapa3.sql
+```
+
+La pantalla `Generador de combinaciones` permite elegir modalidad, periodo, cantidad y estrategia.
+
+Estrategias incluidas:
+
+- `ALEATORIA`: seleccion aleatoria pura.
+- `MAS_FRECUENTES`: prioriza los numeros con mas apariciones del periodo.
+- `MENOS_FRECUENTES`: prioriza los numeros con menos apariciones.
+- `MAYOR_ZSCORE`: prioriza desvios positivos frente a lo esperado.
+- `MAS_ATRASADOS`: prioriza numeros con mas sorteos desde su ultima aparicion.
+- `BALANCEADA`: combina frecuencia, atraso, paridad y decenas.
+- `PONDERADA_FRECUENCIA`: sorteo ponderado por frecuencia y z-score.
+
+Cada combinacion se guarda como `SIMULADA` o `CANDIDATA`, no como jugada real.
+
+Tablas usadas:
+
+- `quini_estrategias`
+- `quini_combinaciones_generadas`
+
+## Etapa 4 - Backtesting
+
+Antes de guardar corridas de backtesting, ejecutar:
+
+```bash
+mysql -u TU_USUARIO -p quini6 < database/schema_etapa4.sql
+```
+
+La pantalla `Backtesting` permite evaluar una estrategia contra sorteos historicos. Para cada sorteo evaluado, el sistema entrena/genera usando solo los sorteos anteriores dentro de la ventana de entrenamiento configurada.
+
+Parametros principales:
+
+- Modalidad.
+- Estrategia.
+- Periodo de prueba.
+- Ventana de entrenamiento.
+- Combinaciones por sorteo.
+
+Resultados:
+
+- Sorteos evaluados.
+- Jugadas generadas.
+- Promedio de aciertos.
+- Mejor acierto.
+- Distribucion de 0 a 6 aciertos.
+- Detalle por sorteo.
+- Comparacion contra multiples simulaciones aleatorias.
+
+La comparacion aleatoria ejecuta N corridas con `ALEATORIA` usando los mismos parametros. Esto evita comparar contra una sola corrida aleatoria con suerte o mala suerte. El percentil indica que porcentaje de corridas aleatorias quedaron por debajo o igual que la estrategia evaluada.
+
+Tablas usadas:
+
+- `quini_backtesting_corridas`
+- `quini_backtesting_detalles`
+
+## Etapa 5 - Comparacion de estrategias
+
+La pantalla `Comparacion de estrategias` ejecuta varias estrategias con los mismos parametros y las ordena por rendimiento.
+
+Parametros:
+
+- Modalidad.
+- Periodo de prueba.
+- Ventana de entrenamiento.
+- Combinaciones por sorteo.
+- Simulaciones aleatorias.
+- Estrategias incluidas.
+
+Resultados:
+
+- Ranking por promedio de aciertos.
+- Diferencia contra promedio aleatorio.
+- Percentil contra aleatoria.
+- Mejor acierto.
+- Distribucion resumida de aciertos.
+
+Esta etapa no agrega tablas nuevas por ahora; calcula bajo demanda usando el historico y el motor de backtesting.
+
+## Etapa 6 - Jugadas candidatas
+
+Antes de usar el estado `SELECCIONADA` y observaciones, ejecutar:
+
+```bash
+mysql -u TU_USUARIO -p quini6 < database/schema_etapa6.sql
+```
+
+La pantalla `Jugadas candidatas` permite gestionar combinaciones generadas:
+
+- Filtrar por estado, modalidad y estrategia.
+- Marcar como `CANDIDATA`.
+- Marcar como `SELECCIONADA`.
+- Volver a `SIMULADA`.
+- Marcar como `ANULADA`.
+- Registrar observaciones.
+
+Esta etapa todavia no registra comprobantes ni apuestas reales. El estado `SELECCIONADA` indica que la combinacion queda preparada para una futura confirmacion como jugada real.
+
+## Etapa 7 - Jugadas reales y aciertos
+
+Antes de registrar jugadas reales, ejecutar:
+
+```bash
+mysql -u TU_USUARIO -p quini6 < database/schema_etapa7.sql
+```
+
+La pantalla `Jugadas reales` permite:
+
+- Ver combinaciones `SELECCIONADA` listas para registrar.
+- Registrar lo jugado en agencia indicando sorteo objetivo, fecha, importe, comprobante, agencia y observaciones.
+- Dejar la jugada en estado `PENDIENTE`.
+- Evaluar pendientes cuando el sorteo ya exista en el historico.
+- Ver aciertos y numeros acertados.
+
+Flujo:
+
+1. En `Jugadas candidatas`, marcar una combinacion como `SELECCIONADA`.
+2. Despues de jugarla en agencia, ir a `Jugadas reales` y usar `Registrar jugada`.
+3. Cuando salga el sorteo, actualizar el historico.
+4. En `Jugadas reales`, usar `Evaluar pendientes`.
+
+Una jugada pendiente solo se evalua si ya existe en la base el sorteo objetivo con la misma modalidad.

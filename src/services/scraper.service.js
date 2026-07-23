@@ -6,7 +6,7 @@ import { parseDrawHtml } from '../scraper/parser.js';
 import { MODALIDADES } from '../scraper/normalizer.js';
 import { getModalidadesByCodigo } from '../repositories/modalidades.repository.js';
 import { insertJugada } from '../repositories/jugadas.repository.js';
-import { getExistingDrawNumbers, upsertSorteo } from '../repositories/sorteos.repository.js';
+import { getExistingDrawNumbers, getLastDraw, upsertSorteo } from '../repositories/sorteos.repository.js';
 import {
   addImportError,
   createImportacion,
@@ -52,15 +52,15 @@ function setState(patch) {
   };
 }
 
-function eligibleLinks(links) {
+function eligibleLinks(links, startYear = env.scraper.startYear) {
   if (env.scraper.startDraw) {
     return links.filter((link) => {
       const match = link.url.match(/resultados-del-(\d{1,2})(\d{1,2})(\d{4})\.html/i);
       if (!match) return true;
-      return Number(match[3]) >= env.scraper.startYear;
+      return Number(match[3]) >= startYear;
     });
   }
-  return links.filter((link) => !link.year || link.year >= env.scraper.startYear);
+  return links.filter((link) => !link.year || link.year >= startYear);
 }
 
 async function saveDraw(draw) {
@@ -125,7 +125,14 @@ async function runImport(importacionId, startedMs) {
   let sorteoFinal = null;
   try {
     const existingDrawNumbers = await getExistingDrawNumbers();
-    const links = eligibleLinks(await discoverHistoricalLinks());
+    const lastDraw = await getLastDraw();
+    const effectiveStartYear = getEffectiveStartYear(lastDraw);
+    const links = eligibleLinks(await discoverHistoricalLinks(effectiveStartYear), effectiveStartYear);
+    setState({
+      message: lastDraw
+        ? `Actualizando historicos desde ${effectiveStartYear}...`
+        : `Carga inicial desde ${effectiveStartYear}...`
+    });
     setState({ progress: { total: links.length } });
     await updateImportacion(importacionId, { sorteos_encontrados: links.length });
 
@@ -221,4 +228,11 @@ async function runImport(importacionId, startedMs) {
   } finally {
     running = false;
   }
+}
+
+function getEffectiveStartYear(lastDraw) {
+  if (!lastDraw?.fechaSorteo) return env.scraper.startYear;
+  const year = Number(String(lastDraw.fechaSorteo).slice(0, 4));
+  if (!Number.isInteger(year)) return env.scraper.startYear;
+  return Math.max(env.scraper.startYear, year);
 }

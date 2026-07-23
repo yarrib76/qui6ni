@@ -79,6 +79,13 @@ body {
   color: var(--muted);
 }
 
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 .btn-primary {
   background: var(--accent);
   border-color: var(--accent);
@@ -174,6 +181,198 @@ body {
   gap: 12px;
   align-items: center;
   padding: 8px 0 8px 20px;
+}
+
+.stats-switch {
+  padding-left: 46px;
+  padding-bottom: 8px;
+}
+
+.stats-panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.stats-panel h2 {
+  font-size: 16px;
+  margin: 0 0 10px;
+}
+
+.bar-cell {
+  position: relative;
+  min-width: 120px;
+  height: 28px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.bar-cell strong {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  height: 100%;
+  align-items: center;
+  padding-left: 8px;
+}
+
+.bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: #cce7e3;
+}
+
+.stats-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.deviation-row {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.deviation-row span {
+  display: block;
+  color: var(--muted);
+}
+
+.stats-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.stats-columns.two {
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #eef2f7;
+}
+
+.status-badge.completo {
+  background: #dff3ea;
+  color: #126144;
+}
+
+.status-badge.evaluada {
+  background: #dff3ea;
+  color: #126144;
+}
+
+.status-badge.parcial,
+.status-badge.revisar,
+.status-badge.candidata,
+.status-badge.seleccionada,
+.status-badge.pendiente {
+  background: #fff1cc;
+  color: #7a5200;
+}
+
+.status-badge.sin_datos,
+.status-badge.anulada {
+  background: #f7d7d7;
+  color: #8a1f1f;
+}
+
+.status-badge.simulada {
+  background: #e8eef7;
+  color: #294469;
+}
+
+.generated-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.generated-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.generated-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.generated-header span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.generated-balls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.generated-card p {
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+
+.hit-distribution {
+  display: grid;
+  gap: 8px;
+}
+
+.hit-row {
+  display: grid;
+  grid-template-columns: 110px minmax(160px, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.strategy-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.strategy-checks label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+}
+
+.candidate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 @media (max-width: 1100px) {

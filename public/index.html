@@ -27,144 +27,668 @@
 
     <div class="app-shell">
       <aside class="sidebar" id="sidebar">
-        <a class="nav-link active" href="/">Historico de jugadas</a>
+        <a class="nav-link active" href="#historico" data-section-link="historicoSection">Historico de jugadas</a>
+        <a class="nav-link" href="#estadisticas" data-section-link="statsSection">Analisis estadistico</a>
+        <a class="nav-link" href="#generador" data-section-link="generatorSection">Generador de combinaciones</a>
+        <a class="nav-link" href="#backtesting" data-section-link="backtestingSection">Backtesting</a>
+        <a class="nav-link" href="#comparacion" data-section-link="comparisonSection">Comparacion de estrategias</a>
+        <a class="nav-link" href="#candidatas" data-section-link="candidatesSection">Jugadas candidatas</a>
+        <a class="nav-link" href="#jugadas-reales" data-section-link="realPlaysSection">Jugadas reales</a>
       </aside>
 
       <main class="content">
-        <section class="page-heading">
-          <div>
-            <h1>Historico de jugadas del Quini 6</h1>
-            <p>Consulta y actualizacion de los resultados historicos del Primer Sorteo y La Segunda.</p>
-          </div>
-          <button class="btn btn-primary" id="updateButton">
-            <span class="spinner-border spinner-border-sm d-none" id="updateSpinner" aria-hidden="true"></span>
-            <span id="updateButtonText">Bajar historicos</span>
-          </button>
-        </section>
-
         <div class="alert alert-danger d-none" id="appError" role="alert"></div>
 
-        <section class="summary-grid" id="summaryGrid">
-          <div class="metric">
-            <span>Ultima ejecucion</span>
-            <strong id="lastRun">-</strong>
-          </div>
-          <div class="metric">
-            <span>Ultimo sorteo</span>
-            <strong id="lastDraw">-</strong>
-          </div>
-          <div class="metric">
-            <span>Fecha ultimo sorteo</span>
-            <strong id="lastDrawDate">-</strong>
-          </div>
-          <div class="metric">
-            <span>Sorteos almacenados</span>
-            <strong id="drawCount">0</strong>
-          </div>
-          <div class="metric">
-            <span>Jugadas almacenadas</span>
-            <strong id="playCount">0</strong>
-          </div>
-          <div class="metric">
-            <span>Estado</span>
-            <strong id="lastStatus">-</strong>
-          </div>
+        <section id="historicoSection">
+          <section class="page-heading">
+            <div>
+              <h1>Historico de jugadas del Quini 6</h1>
+              <p>Consulta y actualizacion de los resultados historicos del Primer Sorteo y La Segunda.</p>
+            </div>
+            <button class="btn btn-primary" id="updateButton">
+              <span class="spinner-border spinner-border-sm d-none" id="updateSpinner" aria-hidden="true"></span>
+              <span id="updateButtonText">Bajar historicos</span>
+            </button>
+          </section>
+
+          <section class="summary-grid" id="summaryGrid">
+            <div class="metric"><span>Ultima ejecucion</span><strong id="lastRun">-</strong></div>
+            <div class="metric"><span>Ultimo sorteo</span><strong id="lastDraw">-</strong></div>
+            <div class="metric"><span>Fecha ultimo sorteo</span><strong id="lastDrawDate">-</strong></div>
+            <div class="metric"><span>Sorteos almacenados</span><strong id="drawCount">0</strong></div>
+            <div class="metric"><span>Jugadas almacenadas</span><strong id="playCount">0</strong></div>
+            <div class="metric"><span>Estado</span><strong id="lastStatus">-</strong></div>
+          </section>
+
+          <section class="status-panel d-none" id="statusPanel">
+            <div class="d-flex justify-content-between align-items-center">
+              <strong id="statusText">Actualizando historicos...</strong>
+              <span id="statusProgress">0 / 0</span>
+            </div>
+            <div class="progress mt-2" role="progressbar">
+              <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="status-details" id="statusDetails"></div>
+          </section>
+
+          <section class="filters">
+            <div class="row g-2 align-items-end">
+              <div class="col-sm-6 col-md-2">
+                <label class="form-label" for="filterYear">Anio</label>
+                <input class="form-control" id="filterYear" type="number" min="2012" />
+              </div>
+              <div class="col-sm-6 col-md-2">
+                <label class="form-label" for="filterMonth">Mes</label>
+                <select class="form-select" id="filterMonth">
+                  <option value="">Todos</option>
+                  <option value="1">Enero</option>
+                  <option value="2">Febrero</option>
+                  <option value="3">Marzo</option>
+                  <option value="4">Abril</option>
+                  <option value="5">Mayo</option>
+                  <option value="6">Junio</option>
+                  <option value="7">Julio</option>
+                  <option value="8">Agosto</option>
+                  <option value="9">Septiembre</option>
+                  <option value="10">Octubre</option>
+                  <option value="11">Noviembre</option>
+                  <option value="12">Diciembre</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-md-2">
+                <label class="form-label" for="filterModalidad">Modalidad</label>
+                <select class="form-select" id="filterModalidad">
+                  <option value="">Todas</option>
+                  <option value="TRADICIONAL">Primer Sorteo</option>
+                  <option value="SEGUNDA">La Segunda</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-md-2">
+                <label class="form-label" for="filterDraw">Sorteo</label>
+                <input class="form-control" id="filterDraw" type="number" min="1" />
+              </div>
+              <div class="col-sm-6 col-md-2">
+                <label class="form-label" for="filterFrom">Desde</label>
+                <input class="form-control" id="filterFrom" type="date" />
+              </div>
+              <div class="col-sm-6 col-md-2">
+                <label class="form-label" for="filterTo">Hasta</label>
+                <input class="form-control" id="filterTo" type="date" />
+              </div>
+              <div class="col-sm-6 col-md-2">
+                <button class="btn btn-outline-secondary w-100" id="clearFilters" type="button">Limpiar filtros</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="view-tabs">
+            <div class="btn-group" role="group">
+              <input type="radio" class="btn-check" name="viewMode" id="tableMode" checked />
+              <label class="btn btn-outline-secondary" for="tableMode">Vista tabla</label>
+              <input type="radio" class="btn-check" name="viewMode" id="groupMode" />
+              <label class="btn btn-outline-secondary" for="groupMode">Vista agrupada</label>
+            </div>
+          </section>
+
+          <section id="tableView">
+            <table class="table table-striped table-hover w-100" id="historicoTable">
+              <thead>
+                <tr>
+                  <th>Anio</th><th>Mes</th><th>Fecha</th><th>Sorteo</th><th>Modalidad</th>
+                  <th>N1</th><th>N2</th><th>N3</th><th>N4</th><th>N5</th><th>N6</th><th>Descarga</th>
+                </tr>
+              </thead>
+            </table>
+          </section>
+
+          <section class="grouped-view d-none" id="groupedView"></section>
         </section>
 
-        <section class="status-panel d-none" id="statusPanel">
-          <div class="d-flex justify-content-between align-items-center">
-            <strong id="statusText">Actualizando historicos...</strong>
-            <span id="statusProgress">0 / 0</span>
-          </div>
-          <div class="progress mt-2" role="progressbar">
-            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-          </div>
-          <div class="status-details" id="statusDetails"></div>
+        <section id="statsSection" class="d-none">
+          <section class="page-heading">
+            <div>
+              <h1>Analisis estadistico</h1>
+              <p>Frecuencias, desvios y patrones por modalidad y periodo.</p>
+            </div>
+            <button class="btn btn-primary" id="statsAnalyzeButton">Analizar</button>
+          </section>
+
+          <section class="filters">
+            <div class="row g-2 align-items-end">
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="statsModalidad">Modalidad</label>
+                <select class="form-select" id="statsModalidad">
+                  <option value="TRADICIONAL">Primer Sorteo</option>
+                  <option value="SEGUNDA">La Segunda</option>
+                  <option value="AMBAS">Ambas</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="statsPeriod">Periodo</label>
+                <select class="form-select" id="statsPeriod">
+                  <option value="TODO">Todo</option>
+                  <option value="ULTIMO_ANIO">Ultimo anio</option>
+                  <option value="ULTIMOS_ANIOS">Ultimos anios</option>
+                  <option value="ULTIMOS_N_SORTEOS">Ultimos N sorteos</option>
+                  <option value="RANGO_FECHAS">Rango fechas</option>
+                  <option value="RANGO_SORTEOS">Rango sorteos</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="statsYears">Anios</label>
+                <input class="form-control" id="statsYears" type="number" min="1" max="20" value="2" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="statsLastDraws">Ultimos sorteos</label>
+                <input class="form-control" id="statsLastDraws" type="number" min="1" max="1000" value="100" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="statsDateFrom">Fecha desde</label>
+                <input class="form-control" id="statsDateFrom" type="date" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="statsDateTo">Fecha hasta</label>
+                <input class="form-control" id="statsDateTo" type="date" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="statsDrawFrom">Sorteo desde</label>
+                <input class="form-control" id="statsDrawFrom" type="number" min="1" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="statsDrawTo">Sorteo hasta</label>
+                <input class="form-control" id="statsDrawTo" type="number" min="1" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="statsName">Nombre</label>
+                <input class="form-control" id="statsName" maxlength="160" />
+              </div>
+              <div class="col-sm-6 col-lg-2 form-check form-switch stats-switch">
+                <input class="form-check-input" id="statsSave" type="checkbox" />
+                <label class="form-check-label" for="statsSave">Guardar analisis</label>
+              </div>
+            </div>
+          </section>
+
+          <section class="summary-grid stats-summary">
+            <div class="metric"><span>Jugadas analizadas</span><strong id="statsPlays">0</strong></div>
+            <div class="metric"><span>Sorteos analizados</span><strong id="statsDraws">0</strong></div>
+            <div class="metric"><span>Periodo</span><strong id="statsRange">-</strong></div>
+            <div class="metric"><span>Esperado por numero</span><strong id="statsExpected">0</strong></div>
+            <div class="metric"><span>Mayor desvio</span><strong id="statsDeviation">-</strong></div>
+            <div class="metric"><span>Analisis guardado</span><strong id="statsSaved">-</strong></div>
+          </section>
+
+          <section class="view-tabs">
+            <div class="btn-group flex-wrap" role="group">
+              <button class="btn btn-outline-secondary active" data-stats-tab="statsFrequency">Frecuencias</button>
+              <button class="btn btn-outline-secondary" data-stats-tab="statsEvolution">Desvios</button>
+              <button class="btn btn-outline-secondary" data-stats-tab="statsDistribution">Distribucion</button>
+              <button class="btn btn-outline-secondary" data-stats-tab="statsPairs">Pares y trios</button>
+              <button class="btn btn-outline-secondary" data-stats-tab="statsQuality">Calidad</button>
+            </div>
+          </section>
+
+          <section class="stats-panel" id="statsFrequency"></section>
+          <section class="stats-panel d-none" id="statsEvolution"></section>
+          <section class="stats-panel d-none" id="statsDistribution"></section>
+          <section class="stats-panel d-none" id="statsPairs"></section>
+          <section class="stats-panel d-none" id="statsQuality"></section>
         </section>
 
-        <section class="filters">
-          <div class="row g-2 align-items-end">
-            <div class="col-sm-6 col-md-2">
-              <label class="form-label" for="filterYear">Anio</label>
-              <input class="form-control" id="filterYear" type="number" min="2012" />
+        <section id="generatorSection" class="d-none">
+          <section class="page-heading">
+            <div>
+              <h1>Generador de combinaciones</h1>
+              <p>Genera combinaciones experimentales usando estrategias estadisticas y periodos configurables.</p>
             </div>
-            <div class="col-sm-6 col-md-2">
-              <label class="form-label" for="filterMonth">Mes</label>
-              <select class="form-select" id="filterMonth">
-                <option value="">Todos</option>
-                <option value="1">Enero</option>
-                <option value="2">Febrero</option>
-                <option value="3">Marzo</option>
-                <option value="4">Abril</option>
-                <option value="5">Mayo</option>
-                <option value="6">Junio</option>
-                <option value="7">Julio</option>
-                <option value="8">Agosto</option>
-                <option value="9">Septiembre</option>
-                <option value="10">Octubre</option>
-                <option value="11">Noviembre</option>
-                <option value="12">Diciembre</option>
-              </select>
+            <button class="btn btn-primary" id="generatorButton">Generar</button>
+          </section>
+
+          <section class="filters">
+            <div class="row g-2 align-items-end">
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="generatorModalidad">Modalidad</label>
+                <select class="form-select" id="generatorModalidad">
+                  <option value="TRADICIONAL">Primer Sorteo</option>
+                  <option value="SEGUNDA">La Segunda</option>
+                  <option value="AMBAS">Ambas</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="generatorStrategy">Estrategia</label>
+                <select class="form-select" id="generatorStrategy">
+                  <option value="ALEATORIA">Aleatoria pura</option>
+                  <option value="MAS_FRECUENTES">Mas frecuentes</option>
+                  <option value="MENOS_FRECUENTES">Menos frecuentes</option>
+                  <option value="MAYOR_ZSCORE">Mayor z-score</option>
+                  <option value="MAS_ATRASADOS">Mas atrasados</option>
+                  <option value="BALANCEADA">Balanceada</option>
+                  <option value="PONDERADA_FRECUENCIA">Ponderada por frecuencia</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="generatorPeriod">Periodo</label>
+                <select class="form-select" id="generatorPeriod">
+                  <option value="ULTIMOS_N_SORTEOS">Ultimos N sorteos</option>
+                  <option value="ULTIMO_ANIO">Ultimo anio</option>
+                  <option value="ULTIMOS_ANIOS">Ultimos anios</option>
+                  <option value="RANGO_FECHAS">Rango fechas</option>
+                  <option value="RANGO_SORTEOS">Rango sorteos</option>
+                  <option value="TODO">Todo</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-1">
+                <label class="form-label" for="generatorCount">Cantidad</label>
+                <input class="form-control" id="generatorCount" type="number" min="1" max="20" value="5" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="generatorLastDraws">Ultimos sorteos</label>
+                <input class="form-control" id="generatorLastDraws" type="number" min="1" max="1000" value="100" />
+              </div>
+              <div class="col-sm-6 col-lg-1">
+                <label class="form-label" for="generatorYears">Anios</label>
+                <input class="form-control" id="generatorYears" type="number" min="1" max="20" value="2" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="generatorState">Estado</label>
+                <select class="form-select" id="generatorState">
+                  <option value="SIMULADA">Simulada</option>
+                  <option value="CANDIDATA">Candidata</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="generatorDateFrom">Fecha desde</label>
+                <input class="form-control" id="generatorDateFrom" type="date" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="generatorDateTo">Fecha hasta</label>
+                <input class="form-control" id="generatorDateTo" type="date" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="generatorDrawFrom">Sorteo desde</label>
+                <input class="form-control" id="generatorDrawFrom" type="number" min="1" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="generatorDrawTo">Sorteo hasta</label>
+                <input class="form-control" id="generatorDrawTo" type="number" min="1" />
+              </div>
+              <div class="col-sm-6 col-lg-2 form-check form-switch stats-switch">
+                <input class="form-check-input" id="generatorSave" type="checkbox" checked />
+                <label class="form-check-label" for="generatorSave">Guardar combinaciones</label>
+              </div>
             </div>
-            <div class="col-sm-6 col-md-2">
-              <label class="form-label" for="filterModalidad">Modalidad</label>
-              <select class="form-select" id="filterModalidad">
-                <option value="">Todas</option>
-                <option value="TRADICIONAL">Primer Sorteo</option>
-                <option value="SEGUNDA">La Segunda</option>
-              </select>
+          </section>
+
+          <section class="summary-grid stats-summary">
+            <div class="metric"><span>Jugadas usadas</span><strong id="generatorPlays">0</strong></div>
+            <div class="metric"><span>Sorteos usados</span><strong id="generatorDraws">0</strong></div>
+            <div class="metric"><span>Estrategia</span><strong id="generatorStrategyLabel">-</strong></div>
+            <div class="metric"><span>Estado</span><strong id="generatorStateLabel">-</strong></div>
+          </section>
+
+          <section class="stats-panel">
+            <h2>Combinaciones generadas</h2>
+            <div class="generated-grid" id="generatedResults"></div>
+          </section>
+
+          <section class="stats-panel">
+            <h2>Historial reciente</h2>
+            <div class="table-responsive">
+              <table class="table table-sm" id="generatedHistory">
+                <thead>
+                  <tr><th>ID</th><th>Fecha</th><th>Estado</th><th>Modalidad</th><th>Estrategia</th><th>Numeros</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
             </div>
-            <div class="col-sm-6 col-md-2">
-              <label class="form-label" for="filterDraw">Sorteo</label>
-              <input class="form-control" id="filterDraw" type="number" min="1" />
-            </div>
-            <div class="col-sm-6 col-md-2">
-              <label class="form-label" for="filterFrom">Desde</label>
-              <input class="form-control" id="filterFrom" type="date" />
-            </div>
-            <div class="col-sm-6 col-md-2">
-              <label class="form-label" for="filterTo">Hasta</label>
-              <input class="form-control" id="filterTo" type="date" />
-            </div>
-            <div class="col-sm-6 col-md-2">
-              <button class="btn btn-outline-secondary w-100" id="clearFilters" type="button">
-                Limpiar filtros
-              </button>
-            </div>
-          </div>
+          </section>
         </section>
 
-        <section class="view-tabs">
-          <div class="btn-group" role="group">
-            <input type="radio" class="btn-check" name="viewMode" id="tableMode" checked />
-            <label class="btn btn-outline-secondary" for="tableMode">Vista tabla</label>
-            <input type="radio" class="btn-check" name="viewMode" id="groupMode" />
-            <label class="btn btn-outline-secondary" for="groupMode">Vista agrupada</label>
-          </div>
+        <section id="backtestingSection" class="d-none">
+          <section class="page-heading">
+            <div>
+              <h1>Backtesting</h1>
+              <p>Evalua estrategias contra sorteos historicos usando solo informacion previa a cada sorteo.</p>
+            </div>
+            <button class="btn btn-primary" id="backtestingButton">Ejecutar</button>
+          </section>
+
+          <section class="filters">
+            <div class="row g-2 align-items-end">
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="backtestingModalidad">Modalidad</label>
+                <select class="form-select" id="backtestingModalidad">
+                  <option value="TRADICIONAL">Primer Sorteo</option>
+                  <option value="SEGUNDA">La Segunda</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="backtestingStrategy">Estrategia</label>
+                <select class="form-select" id="backtestingStrategy">
+                  <option value="BALANCEADA">Balanceada</option>
+                  <option value="PONDERADA_FRECUENCIA">Ponderada por frecuencia</option>
+                  <option value="ALEATORIA">Aleatoria pura</option>
+                  <option value="MAS_FRECUENTES">Mas frecuentes</option>
+                  <option value="MENOS_FRECUENTES">Menos frecuentes</option>
+                  <option value="MAYOR_ZSCORE">Mayor z-score</option>
+                  <option value="MAS_ATRASADOS">Mas atrasados</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="backtestingPeriod">Periodo prueba</label>
+                <select class="form-select" id="backtestingPeriod">
+                  <option value="ULTIMOS_N_SORTEOS">Ultimos N sorteos</option>
+                  <option value="RANGO_FECHAS">Rango fechas</option>
+                  <option value="RANGO_SORTEOS">Rango sorteos</option>
+                  <option value="TODO">Todo</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="backtestingLastDraws">Sorteos prueba</label>
+                <input class="form-control" id="backtestingLastDraws" type="number" min="20" max="2000" value="300" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="backtestingWindow">Ventana entrenamiento</label>
+                <input class="form-control" id="backtestingWindow" type="number" min="10" max="1000" value="100" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="backtestingCombos">Combinaciones/sorteo</label>
+                <input class="form-control" id="backtestingCombos" type="number" min="1" max="20" value="1" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="backtestingRandomRuns">Simulaciones aleatorias</label>
+                <input class="form-control" id="backtestingRandomRuns" type="number" min="1" max="1000" value="100" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="backtestingDateFrom">Fecha desde</label>
+                <input class="form-control" id="backtestingDateFrom" type="date" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="backtestingDateTo">Fecha hasta</label>
+                <input class="form-control" id="backtestingDateTo" type="date" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="backtestingDrawFrom">Sorteo desde</label>
+                <input class="form-control" id="backtestingDrawFrom" type="number" min="1" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="backtestingDrawTo">Sorteo hasta</label>
+                <input class="form-control" id="backtestingDrawTo" type="number" min="1" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="backtestingName">Nombre</label>
+                <input class="form-control" id="backtestingName" maxlength="160" />
+              </div>
+              <div class="col-sm-6 col-lg-2 form-check form-switch stats-switch">
+                <input class="form-check-input" id="backtestingSave" type="checkbox" checked />
+                <label class="form-check-label" for="backtestingSave">Guardar corrida</label>
+              </div>
+              <div class="col-sm-6 col-lg-2 form-check form-switch stats-switch">
+                <input class="form-check-input" id="backtestingCompareRandom" type="checkbox" checked />
+                <label class="form-check-label" for="backtestingCompareRandom">Comparar aleatoria</label>
+              </div>
+            </div>
+          </section>
+
+          <section class="summary-grid stats-summary">
+            <div class="metric"><span>Sorteos evaluados</span><strong id="backtestingDraws">0</strong></div>
+            <div class="metric"><span>Jugadas generadas</span><strong id="backtestingPlays">0</strong></div>
+            <div class="metric"><span>Promedio aciertos</span><strong id="backtestingAverage">0</strong></div>
+            <div class="metric"><span>Mejor acierto</span><strong id="backtestingBest">0</strong></div>
+            <div class="metric"><span>Corrida guardada</span><strong id="backtestingSaved">-</strong></div>
+          </section>
+
+          <section class="stats-panel">
+            <h2>Distribucion de aciertos</h2>
+            <div class="hit-distribution" id="backtestingDistribution"></div>
+          </section>
+
+          <section class="stats-panel d-none" id="backtestingComparisonPanel">
+            <h2>Comparacion contra aleatoria</h2>
+            <div class="comparison-grid" id="backtestingComparison"></div>
+          </section>
+
+          <section class="stats-panel">
+            <h2>Detalle reciente</h2>
+            <div class="table-responsive">
+              <table class="table table-sm" id="backtestingDetails">
+                <thead>
+                  <tr><th>Sorteo</th><th>Fecha</th><th>#</th><th>Generada</th><th>Sorteada</th><th>Aciertos</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="stats-panel">
+            <h2>Corridas guardadas</h2>
+            <div class="table-responsive">
+              <table class="table table-sm" id="backtestingRuns">
+                <thead>
+                  <tr><th>ID</th><th>Fecha</th><th>Modalidad</th><th>Estrategia</th><th>Sorteos</th><th>Promedio</th><th>Mejor</th></tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
         </section>
 
-        <section id="tableView">
-          <table class="table table-striped table-hover w-100" id="historicoTable">
-            <thead>
-              <tr>
-                <th>Anio</th>
-                <th>Mes</th>
-                <th>Fecha</th>
-                <th>Sorteo</th>
-                <th>Modalidad</th>
-                <th>N1</th>
-                <th>N2</th>
-                <th>N3</th>
-                <th>N4</th>
-                <th>N5</th>
-                <th>N6</th>
-                <th>Descarga</th>
-              </tr>
-            </thead>
-          </table>
+        <section id="comparisonSection" class="d-none">
+          <section class="page-heading">
+            <div>
+              <h1>Comparacion de estrategias</h1>
+              <p>Ejecuta varias estrategias bajo los mismos parametros y las ordena por rendimiento historico.</p>
+            </div>
+            <button class="btn btn-primary" id="comparisonButton">Comparar</button>
+          </section>
+
+          <section class="filters">
+            <div class="row g-2 align-items-end">
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="comparisonModalidad">Modalidad</label>
+                <select class="form-select" id="comparisonModalidad">
+                  <option value="TRADICIONAL">Primer Sorteo</option>
+                  <option value="SEGUNDA">La Segunda</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="comparisonPeriod">Periodo prueba</label>
+                <select class="form-select" id="comparisonPeriod">
+                  <option value="ULTIMOS_N_SORTEOS">Ultimos N sorteos</option>
+                  <option value="RANGO_FECHAS">Rango fechas</option>
+                  <option value="RANGO_SORTEOS">Rango sorteos</option>
+                  <option value="TODO">Todo</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="comparisonLastDraws">Sorteos prueba</label>
+                <input class="form-control" id="comparisonLastDraws" type="number" min="20" max="2000" value="300" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="comparisonWindow">Ventana entrenamiento</label>
+                <input class="form-control" id="comparisonWindow" type="number" min="10" max="1000" value="100" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="comparisonCombos">Combinaciones/sorteo</label>
+                <input class="form-control" id="comparisonCombos" type="number" min="1" max="20" value="1" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="comparisonRandomRuns">Simulaciones aleatorias</label>
+                <input class="form-control" id="comparisonRandomRuns" type="number" min="1" max="1000" value="100" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="comparisonDateFrom">Fecha desde</label>
+                <input class="form-control" id="comparisonDateFrom" type="date" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="comparisonDateTo">Fecha hasta</label>
+                <input class="form-control" id="comparisonDateTo" type="date" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="comparisonDrawFrom">Sorteo desde</label>
+                <input class="form-control" id="comparisonDrawFrom" type="number" min="1" />
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="comparisonDrawTo">Sorteo hasta</label>
+                <input class="form-control" id="comparisonDrawTo" type="number" min="1" />
+              </div>
+            </div>
+            <div class="strategy-checks" id="comparisonStrategies">
+              <label><input type="checkbox" value="ALEATORIA" checked /> Aleatoria</label>
+              <label><input type="checkbox" value="BALANCEADA" checked /> Balanceada</label>
+              <label><input type="checkbox" value="PONDERADA_FRECUENCIA" checked /> Ponderada</label>
+              <label><input type="checkbox" value="MAS_FRECUENTES" checked /> Mas frecuentes</label>
+              <label><input type="checkbox" value="MENOS_FRECUENTES" checked /> Menos frecuentes</label>
+              <label><input type="checkbox" value="MAYOR_ZSCORE" checked /> Mayor z-score</label>
+              <label><input type="checkbox" value="MAS_ATRASADOS" checked /> Mas atrasados</label>
+            </div>
+          </section>
+
+          <section class="summary-grid stats-summary">
+            <div class="metric"><span>Aleatoria promedio</span><strong id="comparisonRandomAverage">0</strong></div>
+            <div class="metric"><span>Rango aleatorio</span><strong id="comparisonRandomRange">-</strong></div>
+            <div class="metric"><span>Mejor estrategia</span><strong id="comparisonBestStrategy">-</strong></div>
+            <div class="metric"><span>Promedio mejor</span><strong id="comparisonBestAverage">0</strong></div>
+          </section>
+
+          <section class="stats-panel">
+            <h2>Ranking</h2>
+            <div class="table-responsive">
+              <table class="table table-sm" id="comparisonTable">
+                <thead>
+                  <tr>
+                    <th>#</th><th>Estrategia</th><th>Promedio</th><th>Diferencia azar</th><th>Percentil</th><th>Mejor</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4+</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
         </section>
 
-        <section class="grouped-view d-none" id="groupedView"></section>
+        <section id="candidatesSection" class="d-none">
+          <section class="page-heading">
+            <div>
+              <h1>Jugadas candidatas</h1>
+              <p>Gestiona combinaciones generadas antes de confirmarlas como jugadas reales.</p>
+            </div>
+            <button class="btn btn-primary" id="candidatesRefreshButton">Actualizar</button>
+          </section>
+
+          <section class="filters">
+            <div class="row g-2 align-items-end">
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="candidateState">Estado</label>
+                <select class="form-select" id="candidateState">
+                  <option value="CANDIDATA">Candidata</option>
+                  <option value="SELECCIONADA">Seleccionada</option>
+                  <option value="SIMULADA">Simulada</option>
+                  <option value="ANULADA">Anulada</option>
+                  <option value="">Todas</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="candidateModalidad">Modalidad</label>
+                <select class="form-select" id="candidateModalidad">
+                  <option value="">Todas</option>
+                  <option value="TRADICIONAL">Primer Sorteo</option>
+                  <option value="SEGUNDA">La Segunda</option>
+                  <option value="AMBAS">Ambas</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="candidateStrategy">Estrategia</label>
+                <select class="form-select" id="candidateStrategy">
+                  <option value="">Todas</option>
+                  <option value="ALEATORIA">Aleatoria</option>
+                  <option value="BALANCEADA">Balanceada</option>
+                  <option value="PONDERADA_FRECUENCIA">Ponderada</option>
+                  <option value="MAS_FRECUENTES">Mas frecuentes</option>
+                  <option value="MENOS_FRECUENTES">Menos frecuentes</option>
+                  <option value="MAYOR_ZSCORE">Mayor z-score</option>
+                  <option value="MAS_ATRASADOS">Mas atrasados</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <section class="stats-panel">
+            <h2>Combinaciones</h2>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle" id="candidatesTable">
+                <thead>
+                  <tr>
+                    <th>ID</th><th>Fecha</th><th>Estado</th><th>Modalidad</th><th>Estrategia</th><th>Numeros</th><th>Observaciones</th><th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="realPlaysSection" class="d-none">
+          <section class="page-heading">
+            <div>
+              <h1>Jugadas reales</h1>
+              <p>Registra lo jugado en agencia y evalua aciertos cuando el sorteo ya este cargado.</p>
+            </div>
+            <div class="header-actions">
+              <button class="btn btn-outline-secondary" id="realPlaysRefreshButton">Actualizar</button>
+              <button class="btn btn-primary" id="evaluateRealPlaysButton">Evaluar pendientes</button>
+            </div>
+          </section>
+
+          <section class="stats-panel">
+            <h2>Seleccionadas para registrar</h2>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle" id="selectedForRealTable">
+                <thead>
+                  <tr>
+                    <th>ID</th><th>Fecha</th><th>Modalidad</th><th>Estrategia</th><th>Numeros</th><th>Accion</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="filters">
+            <div class="row g-2 align-items-end">
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="realPlayState">Estado</label>
+                <select class="form-select" id="realPlayState">
+                  <option value="">Todas</option>
+                  <option value="PENDIENTE">Pendiente</option>
+                  <option value="EVALUADA">Evaluada</option>
+                  <option value="ANULADA">Anulada</option>
+                </select>
+              </div>
+              <div class="col-sm-6 col-lg-2">
+                <label class="form-label" for="realPlayModalidad">Modalidad</label>
+                <select class="form-select" id="realPlayModalidad">
+                  <option value="">Todas</option>
+                  <option value="TRADICIONAL">Primer Sorteo</option>
+                  <option value="SEGUNDA">La Segunda</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <section class="stats-panel">
+            <h2>Historial de jugadas reales</h2>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle" id="realPlaysTable">
+                <thead>
+                  <tr>
+                    <th>ID</th><th>Fecha jugada</th><th>Estado</th><th>Sorteo</th><th>Modalidad</th><th>Numeros</th><th>Aciertos</th><th>Acertados</th><th>Comprobante</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
       </main>
     </div>
 
