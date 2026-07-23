@@ -20,6 +20,14 @@ Crear la base y tablas ejecutando:
 mysql -u TU_USUARIO -p < database/schema.sql
 ```
 
+Para una instalacion nueva con todas las etapas implementadas hasta ahora, usar el esquema consolidado:
+
+```bash
+mysql -u TU_USUARIO -p < database/schema_completo.sql
+```
+
+Ese archivo crea la base `quini6`, las tablas historicas, analisis, generador, backtesting, candidatas y jugadas reales. Tambien actualiza catalogos y aplica cambios compatibles sobre `quini_combinaciones_generadas` si ya existia.
+
 Copiar `.env.example` a `.env` y completar credenciales:
 
 ```env
@@ -56,7 +64,7 @@ docker compose --env-file .env.docker up -d --build
 
 Abrir `http://localhost:3000`.
 
-El primer arranque de MySQL ejecuta automaticamente `database/schema.sql` sobre el volumen nuevo `quini6_mysql_data`.
+El primer arranque de MySQL ejecuta automaticamente `database/schema_completo.sql` sobre el volumen nuevo `quini6_mysql_data`.
 
 Para ver logs:
 
